@@ -8,8 +8,8 @@
  * Usage — theme:
  *   new Simply_GitHub_Updater( 'theme', 'simply-starter', 'staceyzav/simply-starter', '2.10.1' );
  *
- * Add to wp-config.php on each site to authenticate against private repos:
- *   define( 'SIMPLY_GITHUB_TOKEN', 'ghp_your_token_here' );
+ * Add to wp-config.php to enable auto-updates:
+ *   define( 'SIMPLY_AUTO_UPDATE', true );
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -24,12 +24,6 @@ class Simply_GitHub_Updater {
 	private $version;
 	private $cache_key;
 
-	/**
-	 * @param string $type    'plugin' or 'theme'
-	 * @param string $slug    Plugin: 'folder/file.php'. Theme: theme folder slug.
-	 * @param string $repo    GitHub 'owner/repository'
-	 * @param string $version Current installed version string
-	 */
 	public function __construct( $type, $slug, $repo, $version ) {
 		$this->type      = $type;
 		$this->slug      = $slug;
@@ -37,80 +31,54 @@ class Simply_GitHub_Updater {
 		$this->version   = $version;
 		$this->cache_key = 'sghu_' . md5( $repo );
 
+		// Inject update directly into the transient on every admin load.
+		// Bypasses WP Engine's wpe-update-source-selector filter interception.
+		add_action( 'admin_init', [ $this, 'inject_update' ], 9999 );
+
+		// Clear GitHub cache after an update completes so next version shows immediately.
+		add_action( 'upgrader_process_complete', [ $this, 'purge_cache' ], 10, 2 );
+
 		if ( $type === 'plugin' ) {
-			add_filter( 'site_transient_update_plugins', [ $this, 'check_update' ] );
 			add_filter( 'plugins_api', [ $this, 'plugin_info' ], 20, 3 );
 			add_filter( 'upgrader_source_selection', [ $this, 'fix_folder_name' ], 10, 4 );
 			add_filter( 'auto_update_plugin', [ $this, 'maybe_auto_update' ], 10, 2 );
 		} else {
-			add_filter( 'site_transient_update_themes', [ $this, 'check_update' ] );
 			add_filter( 'upgrader_source_selection', [ $this, 'fix_folder_name' ], 10, 4 );
 			add_filter( 'auto_update_theme', [ $this, 'maybe_auto_update' ], 10, 2 );
 		}
 	}
 
-	// ── Cache ──────────────────────────��─────────────────────────────
+	// ── Cache purge ───────────────────────────────────────────────────
 
 	public function purge_cache() {
 		delete_transient( $this->cache_key );
 	}
 
-	// ── GitHub API ───────────────────���───────────────────────────────
+	// ── Inject update into the transient directly ─────────────────────
+	// Reads the existing update transient, adds our entry if needed, and
+	// writes it back. Avoids relying on filter hooks WP Engine intercepts.
 
-	private function get_release() {
-		$cached = get_transient( $this->cache_key );
-		if ( false !== $cached && null !== $cached ) return $cached;
-
-		$headers = [
-			'Accept'     => 'application/vnd.github.v3+json',
-			'User-Agent' => 'Simply-Design-Updater/1.0',
-		];
-
-		if ( defined( 'SIMPLY_GITHUB_TOKEN' ) && SIMPLY_GITHUB_TOKEN ) {
-			$headers['Authorization'] = 'Bearer ' . SIMPLY_GITHUB_TOKEN;
-		}
-
-		$response = wp_remote_get(
-			"https://api.github.com/repos/{$this->repo}/tags",
-			[ 'headers' => $headers, 'timeout' => 10 ]
-		);
-
-		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
-			set_transient( $this->cache_key, null, 30 * MINUTE_IN_SECONDS );
-			return null;
-		}
-
-		$data = json_decode( wp_remote_retrieve_body( $response ) );
-
-		if ( empty( $data ) || ! isset( $data[0]->name ) ) {
-			set_transient( $this->cache_key, null, 30 * MINUTE_IN_SECONDS );
-			return null;
-		}
-
-		$release = (object) [
-			'version'     => ltrim( $data[0]->name, 'v' ),
-			'zip_url'     => "https://github.com/{$this->repo}/archive/refs/tags/{$data[0]->name}.zip",
-			'description' => '',
-			'published'   => '',
-		];
-
-		set_transient( $this->cache_key, $release, 6 * HOUR_IN_SECONDS );
-		return $release;
-	}
-
-	// ── Update check ─────────────────────────────────────────────────
-
-	public function check_update( $transient ) {
-		if ( ! is_object( $transient ) ) return $transient;
+	public function inject_update() {
+		if ( ! current_user_can( 'update_plugins' ) ) return;
 
 		$release = $this->get_release();
-		if ( ! $release || ! version_compare( $release->version, $this->version, '>' ) ) {
-			return $transient;
+		if ( ! $release || ! version_compare( $release->version, $this->version, '>' ) ) return;
+
+		$option_key = $this->type === 'plugin' ? 'update_plugins' : 'update_themes';
+		$transient  = get_site_transient( $option_key );
+
+		if ( ! is_object( $transient ) ) {
+			$transient           = new stdClass();
+			$transient->checked  = [];
+			$transient->response = [];
 		}
 
 		if ( ! isset( $transient->response ) ) {
 			$transient->response = [];
 		}
+
+		// Already registered — nothing to do.
+		if ( isset( $transient->response[ $this->slug ] ) ) return;
 
 		if ( $this->type === 'plugin' ) {
 			$transient->response[ $this->slug ] = (object) [
@@ -129,7 +97,50 @@ class Simply_GitHub_Updater {
 			];
 		}
 
-		return $transient;
+		set_site_transient( $option_key, $transient );
+	}
+
+	// ── GitHub API ────────────────────────────────────────────────────
+
+	private function get_release() {
+		$cached = get_transient( $this->cache_key );
+		if ( $cached instanceof stdClass ) return $cached;
+
+		$headers = [
+			'Accept'     => 'application/vnd.github.v3+json',
+			'User-Agent' => 'Simply-Design-Updater/1.0',
+		];
+
+		if ( defined( 'SIMPLY_GITHUB_TOKEN' ) && SIMPLY_GITHUB_TOKEN ) {
+			$headers['Authorization'] = 'Bearer ' . SIMPLY_GITHUB_TOKEN;
+		}
+
+		$response = wp_remote_get(
+			"https://api.github.com/repos/{$this->repo}/tags",
+			[ 'headers' => $headers, 'timeout' => 10 ]
+		);
+
+		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+			set_transient( $this->cache_key, 'error', 30 * MINUTE_IN_SECONDS );
+			return null;
+		}
+
+		$data = json_decode( wp_remote_retrieve_body( $response ) );
+
+		if ( empty( $data ) || ! isset( $data[0]->name ) ) {
+			set_transient( $this->cache_key, 'error', 30 * MINUTE_IN_SECONDS );
+			return null;
+		}
+
+		$release = (object) [
+			'version'     => ltrim( $data[0]->name, 'v' ),
+			'zip_url'     => "https://github.com/{$this->repo}/archive/refs/tags/{$data[0]->name}.zip",
+			'description' => '',
+			'published'   => '',
+		];
+
+		set_transient( $this->cache_key, $release, 6 * HOUR_IN_SECONDS );
+		return $release;
 	}
 
 	// ── Plugin info popup ─────────────────────────────────────────────
@@ -153,7 +164,6 @@ class Simply_GitHub_Updater {
 	}
 
 	// ── Auto-update support ───────────────────────────────────────────
-	// Add define( 'SIMPLY_AUTO_UPDATE', true ) to wp-config.php to enable.
 
 	public function maybe_auto_update( $update, $item ) {
 		if ( ! defined( 'SIMPLY_AUTO_UPDATE' ) || ! SIMPLY_AUTO_UPDATE ) return $update;
@@ -162,7 +172,6 @@ class Simply_GitHub_Updater {
 	}
 
 	// ── Fix GitHub's auto-generated folder name after install ─────────
-	// GitHub zips extract as 'owner-repo-abc123/' — rename to the correct slug.
 
 	public function fix_folder_name( $source, $remote_source, $upgrader, $hook_extra = [] ) {
 		global $wp_filesystem;
@@ -171,7 +180,6 @@ class Simply_GitHub_Updater {
 
 		if ( $source === $correct || ! is_dir( $source ) ) return $source;
 
-		// Match by hook_extra (auto-updater) or by presence of our main file (manual ZIP upload)
 		$expected_plugin = isset( $hook_extra['plugin'] ) && $hook_extra['plugin'] === $this->slug;
 		$expected_theme  = isset( $hook_extra['theme'] )  && $hook_extra['theme']  === $this->slug;
 		$main_file       = $this->type === 'plugin' ? basename( $this->slug ) : $this->slug . '.php';
