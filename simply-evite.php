@@ -101,13 +101,6 @@ function se_shortcode( $atts ) {
 			<!-- Piece 3: envelope front — V-notch cut out at top -->
 			<div class="se-env-front" aria-hidden="true"></div>
 
-			<!-- Scroll hint — fades in after animation, hides on scroll -->
-			<div class="se-scroll-hint" aria-hidden="true">
-				<span class="se-scroll-hint__text"><?php esc_html_e( 'more info', 'simply-evite' ); ?></span>
-				<svg class="se-scroll-hint__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<polyline points="6 9 12 15 18 9"></polyline>
-				</svg>
-			</div>
 
 		</div>
 
@@ -125,6 +118,7 @@ function se_shortcode( $atts ) {
 			<span class="se-hamburger" aria-hidden="true">
 				<span></span><span></span><span></span>
 			</span>
+			<span class="se-toggle-label" aria-hidden="true"><?php esc_html_e( 'more info', 'simply-evite' ); ?></span>
 		</button>
 
 		<!-- Sidebar panel — fixed, slides in from right -->

@@ -9,7 +9,6 @@
 		var front      = evite.querySelector( '.se-env-front' );
 		var card       = evite.querySelector( '.se-card' );
 		var cardWrap   = evite.querySelector( '.se-card-wrap' );
-		var scrollHint = stage.querySelector( '.se-scroll-hint' );
 		var toggleBtn  = evite.querySelector( '.se-sidebar-toggle' );
 		var sidePanel  = evite.querySelector( '.se-sidebar-panel' );
 		var trigger    = evite.dataset.trigger || 'auto';
@@ -101,21 +100,6 @@
 			} );
 		}
 
-		// ── Scroll hint ──────────────────────────────────────────────────
-
-		function initScrollHint() {
-			if ( ! scrollHint ) return;
-			window.addEventListener( 'scroll', function () {
-				if ( window.scrollY > 50 ) {
-					scrollHint.classList.remove( 'is-visible' );
-					scrollHint.classList.add( 'is-hidden' );
-				} else {
-					scrollHint.classList.remove( 'is-hidden' );
-					scrollHint.classList.add( 'is-visible' );
-				}
-			}, { passive: true } );
-		}
-
 		// ── Open — 3-phase animation ─────────────────────────────────────
 		//
 		// Envelope never moves. Card does all the work.
@@ -125,7 +109,7 @@
 		// Phase 2 (t=550ms): Card rotates 90° (landscape → portrait) + scales up.
 		// Phase 3 (t=1450ms):Card slides back DOWN to viewport center.
 		//
-		// After animation (t≈2400ms): sidebar slides in, scroll hint appears.
+		// After animation (t≈2400ms): sidebar slides in.
 
 		function open() {
 			if ( opened ) return;
@@ -162,14 +146,10 @@
 				card.style.transform  = 'rotate(0deg) scale(' + cardScale + ')';
 			}, 1450 );
 
-			// ── Post-animation: reveal sidebar + scroll hint ─────────────
+			// ── Post-animation: reveal sidebar ───────────────────────────
 			setTimeout( function () {
 				if ( toggleBtn ) toggleBtn.classList.add( 'is-visible' );
 				if ( window.innerWidth > 768 ) openSidebar();
-				if ( scrollHint ) {
-					scrollHint.classList.add( 'is-visible' );
-					initScrollHint();
-				}
 			}, 2400 );
 		}
 

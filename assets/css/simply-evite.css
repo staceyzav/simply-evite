@@ -123,55 +123,12 @@
 }
 
 
-/* ── Scroll hint (bottom-left of stage, fades in after animation) ── */
-
-.se-scroll-hint {
-	position: absolute;
-	left: 40px;
-	bottom: 48px;
-	z-index: 50;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 4px;
-	opacity: 0;
-	pointer-events: none;
-	transition: opacity 0.6s ease;
-}
-
-.se-scroll-hint.is-visible {
-	opacity: 1;
-}
-
-.se-scroll-hint.is-hidden {
-	opacity: 0;
-	transition: opacity 0.4s ease;
-}
-
-.se-scroll-hint__text {
-	font-size: 10px;
-	letter-spacing: 0.16em;
-	text-transform: uppercase;
-	color: rgba( 255, 255, 255, 0.9 );
-	white-space: nowrap;
-	text-shadow: 0 1px 6px rgba( 0, 0, 0, 0.55 );
-}
-
-.se-scroll-hint__chevron {
-	width: 22px;
-	height: 22px;
-	color: rgba( 255, 255, 255, 0.9 );
-	filter: drop-shadow( 0 1px 4px rgba( 0, 0, 0, 0.5 ) );
-	animation: se-pulse-down 1.8s ease-in-out infinite;
-}
-
-@keyframes se-pulse-down {
-	0%, 100% { transform: translateY( 0 );   opacity: 0.65; }
-	50%       { transform: translateY( 6px ); opacity: 1;    }
-}
-
-
 /* ── Sidebar toggle (fixed, top-right) ───────────────────────────── */
+
+@keyframes se-pulse-toggle {
+	0%, 100% { transform: scale( 1 ); }
+	50%       { transform: scale( 1.15 ); }
+}
 
 .se-sidebar-toggle {
 	position: fixed;
@@ -179,7 +136,6 @@
 	right: 24px;
 	z-index: 502;
 	width: 52px;
-	height: 52px;
 	background: transparent !important;
 	background-color: transparent !important;
 	border: none !important;
@@ -188,11 +144,43 @@
 	box-shadow: none !important;
 	cursor: pointer;
 	display: flex;
+	flex-direction: column;
 	align-items: center;
-	justify-content: center;
+	gap: 5px;
 	opacity: 0;
 	pointer-events: none;
 	transition: opacity 0.4s ease;
+}
+
+.se-sidebar-toggle.is-visible:not( .is-open ) {
+	animation: se-pulse-toggle 2s ease-in-out infinite;
+}
+
+.se-sidebar-toggle:hover,
+.se-sidebar-toggle:focus,
+.se-sidebar-toggle:focus-visible,
+.se-sidebar-toggle:active {
+	background: transparent !important;
+	background-color: transparent !important;
+	box-shadow: none !important;
+	outline: none !important;
+	animation: none;
+	transform: scale( 1.2 );
+	transition: transform 0.15s ease;
+}
+
+.se-toggle-label {
+	font-size: 9px;
+	letter-spacing: 0.13em;
+	text-transform: uppercase;
+	color: rgba( 255, 255, 255, 0.9 );
+	text-shadow: 0 1px 6px rgba( 0, 0, 0, 0.55 );
+	white-space: nowrap;
+	transition: opacity 0.3s ease;
+}
+
+.se-sidebar-toggle.is-open .se-toggle-label {
+	opacity: 0;
 }
 
 .se-sidebar-toggle.is-visible {
@@ -291,6 +279,33 @@
 .se-sidebar__rsvp {
 	display: block;
 	text-align: center;
+}
+
+
+/* ── RSVP button ────────────────────────────────────────────────── */
+
+.se-sidebar__rsvp.button {
+	display: block;
+	width: 100%;
+	box-sizing: border-box;
+	text-align: center;
+	background: var( --client-accent, #2563eb );
+	color: var( --client-accent-text, #ffffff );
+	border: none;
+	border-radius: var( --se-radius );
+	padding: 12px 20px;
+	font-size: 14px;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	text-decoration: none;
+	transition: background 0.2s ease, color 0.2s ease;
+}
+
+.se-sidebar__rsvp.button:hover,
+.se-sidebar__rsvp.button:focus {
+	background: var( --client-accent-hover, #1d4ed8 );
+	color: var( --client-accent-text, #ffffff );
+	text-decoration: none;
 }
 
 

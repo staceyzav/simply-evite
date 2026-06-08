@@ -89,7 +89,7 @@ class Simply_GitHub_Updater {
 
 		$release = (object) [
 			'version'     => ltrim( $data[0]->name, 'v' ),
-			'zip_url'     => $data[0]->zipball_url,
+			'zip_url'     => "https://github.com/{$this->repo}/archive/refs/tags/{$data[0]->name}.zip",
 			'description' => '',
 			'published'   => '',
 		];
