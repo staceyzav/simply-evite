@@ -16,7 +16,7 @@ define( 'SE_VERSION', '1.0.1' );
 define( 'SE_URL',     plugin_dir_url( __FILE__ ) );
 
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-github-updater.php';
-new Simply_GitHub_Updater( 'plugin', 'simply-evite/simply-evite.php', 'staceyzav/simply-evite', SE_VERSION );
+new Simply_GitHub_Updater( 'plugin', plugin_basename( __FILE__ ), 'staceyzav/simply-evite', SE_VERSION );
 
 add_action( 'wp_enqueue_scripts', 'se_enqueue' );
 function se_enqueue() {
