@@ -38,15 +38,13 @@ class Simply_GitHub_Updater {
 		$this->cache_key = 'sghu_' . md5( $repo );
 
 		if ( $type === 'plugin' ) {
-			add_filter( 'pre_set_site_transient_update_plugins', [ $this, 'check_update' ] );
+			add_filter( 'site_transient_update_plugins', [ $this, 'check_update' ] );
 			add_filter( 'plugins_api', [ $this, 'plugin_info' ], 20, 3 );
 			add_filter( 'upgrader_source_selection', [ $this, 'fix_folder_name' ], 10, 4 );
-			add_action( 'wp_update_plugins', [ $this, 'purge_cache' ] );
 			add_filter( 'auto_update_plugin', [ $this, 'maybe_auto_update' ], 10, 2 );
 		} else {
-			add_filter( 'pre_set_site_transient_update_themes', [ $this, 'check_update' ] );
+			add_filter( 'site_transient_update_themes', [ $this, 'check_update' ] );
 			add_filter( 'upgrader_source_selection', [ $this, 'fix_folder_name' ], 10, 4 );
-			add_action( 'wp_update_themes', [ $this, 'purge_cache' ] );
 			add_filter( 'auto_update_theme', [ $this, 'maybe_auto_update' ], 10, 2 );
 		}
 	}
@@ -103,11 +101,15 @@ class Simply_GitHub_Updater {
 	// ── Update check ─────────────────────────────────────────────────
 
 	public function check_update( $transient ) {
-		if ( empty( $transient->checked ) ) return $transient;
+		if ( ! is_object( $transient ) ) return $transient;
 
 		$release = $this->get_release();
 		if ( ! $release || ! version_compare( $release->version, $this->version, '>' ) ) {
 			return $transient;
+		}
+
+		if ( ! isset( $transient->response ) ) {
+			$transient->response = [];
 		}
 
 		if ( $this->type === 'plugin' ) {
