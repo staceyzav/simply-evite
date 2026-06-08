@@ -14,7 +14,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-if ( class_exists( 'Simply_GitHub_Updater' ) ) return;
+if ( ! class_exists( 'Simply_GitHub_Updater' ) ) :
 
 class Simply_GitHub_Updater {
 
@@ -162,3 +162,5 @@ class Simply_GitHub_Updater {
 		return $source;
 	}
 }
+
+endif;
