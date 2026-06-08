@@ -178,19 +178,21 @@
 	top: 24px;
 	right: 24px;
 	z-index: 502;
-	width: 44px;
-	height: 44px;
-	background: var( --client-section-dark-bg, #1a1a1a );
-	border: none;
-	border-radius: 6px;
+	width: 52px;
+	height: 52px;
+	background: transparent !important;
+	background-color: transparent !important;
+	border: none !important;
+	border-radius: 0 !important;
+	padding: 0 !important;
+	box-shadow: none !important;
 	cursor: pointer;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	box-shadow: 0 2px 16px rgba( 0, 0, 0, 0.35 );
 	opacity: 0;
 	pointer-events: none;
-	transition: opacity 0.4s ease, background 0.2s ease;
+	transition: opacity 0.4s ease;
 }
 
 .se-sidebar-toggle.is-visible {
@@ -198,23 +200,20 @@
 	pointer-events: auto;
 }
 
-.se-sidebar-toggle:hover {
-	background: var( --client-section-dark-highlight, #444 );
-}
-
 /* Hamburger → X */
 .se-hamburger {
 	display: flex;
 	flex-direction: column;
-	gap: 5px;
+	gap: 7px;
 }
 
 .se-hamburger span {
 	display: block;
-	width: 18px;
-	height: 1.5px;
+	width: 28px;
+	height: 1px;
 	background: var( --client-section-dark-text, #f0f0f0 );
-	border-radius: 2px;
+	border-radius: 0;
+	filter: drop-shadow( 0 1px 3px rgba( 0, 0, 0, 0.6 ) );
 	transition: transform 0.3s ease, opacity 0.3s ease;
 	transform-origin: center;
 }
