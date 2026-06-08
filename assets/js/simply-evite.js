@@ -36,7 +36,7 @@
 			card.style.width  = cardW + 'px';
 			cardWStore        = cardW;
 
-			var cardH = cardW * 1.5;
+			var cardH = cardW * ( 4 / 3 );
 			var flapH = Math.round( cardW * 0.32 );
 			var envW  = cardH + pad * 2;
 			var envH  = cardW + pad * 2;
@@ -163,7 +163,7 @@
 			// ── Post-animation: reveal sidebar + scroll hint ─────────────
 			setTimeout( function () {
 				if ( toggleBtn ) toggleBtn.classList.add( 'is-visible' );
-				openSidebar();
+				if ( window.innerWidth > 768 ) openSidebar();
 				if ( scrollHint ) {
 					scrollHint.classList.add( 'is-visible' );
 					initScrollHint();

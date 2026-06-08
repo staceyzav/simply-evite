@@ -79,7 +79,7 @@
 
 .se-card {
 	width: 260px;           /* JS overrides to fill viewport */
-	aspect-ratio: 2 / 3;
+	aspect-ratio: 3 / 4;
 	background: #fff;
 	overflow: hidden;
 	box-shadow: none;

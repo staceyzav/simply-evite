@@ -27,7 +27,7 @@ function se_enqueue() {
 // ==========================================================================
 // SHORTCODE — [simply_evite]
 //
-// image      — URL of the invitation image (required) — 1200×1800 portrait
+// image      — URL of the invitation image (required) — 1200×1600 portrait
 // alt        — image alt text
 // summary    — short event description shown in the sidebar
 // date       — date/time string, e.g. "Saturday, June 14 at 6:00 PM"
