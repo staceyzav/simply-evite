@@ -158,10 +158,12 @@ class Simply_GitHub_Updater {
 
 		if ( $source === $correct || ! is_dir( $source ) ) return $source;
 
-		// Only act on our own update
+		// Match by hook_extra (auto-updater) or by presence of our main file (manual ZIP upload)
 		$expected_plugin = isset( $hook_extra['plugin'] ) && $hook_extra['plugin'] === $this->slug;
 		$expected_theme  = isset( $hook_extra['theme'] )  && $hook_extra['theme']  === $this->slug;
-		if ( ! $expected_plugin && ! $expected_theme ) return $source;
+		$main_file       = $this->type === 'plugin' ? basename( $this->slug ) : $this->slug . '.php';
+		$has_main_file   = $wp_filesystem->exists( trailingslashit( $source ) . $main_file );
+		if ( ! $expected_plugin && ! $expected_theme && ! $has_main_file ) return $source;
 
 		if ( $wp_filesystem->move( $source, $correct ) ) {
 			return $correct;
