@@ -18,25 +18,6 @@ define( 'SE_URL',     plugin_dir_url( __FILE__ ) );
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-github-updater.php';
 new Simply_GitHub_Updater( 'plugin', plugin_basename( __FILE__ ), 'staceyzav/simply-evite', SE_VERSION );
 
-// TEMP DEBUG — remove after confirming updater works
-add_action( 'admin_notices', 'se_debug_updater' );
-function se_debug_updater() {
-	if ( ! current_user_can( 'manage_options' ) ) return;
-	$response = wp_remote_get( 'https://api.github.com/repos/staceyzav/simply-evite/tags', [
-		'headers' => [ 'Accept' => 'application/vnd.github.v3+json', 'User-Agent' => 'Simply-Design-Updater/1.0' ],
-		'timeout' => 10,
-	] );
-	if ( is_wp_error( $response ) ) {
-		$msg = 'GitHub API error: ' . $response->get_error_message();
-	} else {
-		$code = wp_remote_retrieve_response_code( $response );
-		$data = json_decode( wp_remote_retrieve_body( $response ) );
-		$tag  = ( is_array( $data ) && ! empty( $data[0]->name ) ) ? $data[0]->name : 'none';
-		$msg  = 'GitHub API status: ' . $code . ' — latest tag: ' . $tag . ' — plugin slug: ' . plugin_basename( __FILE__ );
-	}
-	echo '<div class="notice notice-info"><p><strong>SE Updater Debug:</strong> ' . esc_html( $msg ) . '</p></div>';
-}
-
 add_action( 'wp_enqueue_scripts', 'se_enqueue' );
 function se_enqueue() {
 	wp_enqueue_style(  'simply-evite', SE_URL . 'assets/css/simply-evite.css', array(), SE_VERSION );
