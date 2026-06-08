@@ -22,7 +22,7 @@ new Simply_GitHub_Updater( 'plugin', plugin_basename( __FILE__ ), 'staceyzav/sim
 add_action( 'admin_notices', 'se_debug_updater' );
 function se_debug_updater() {
 	if ( ! current_user_can( 'manage_options' ) ) return;
-	$response = wp_remote_get( 'https://api.github.com/repos/staceyzav/simply-evite/releases/latest', [
+	$response = wp_remote_get( 'https://api.github.com/repos/staceyzav/simply-evite/tags', [
 		'headers' => [ 'Accept' => 'application/vnd.github.v3+json', 'User-Agent' => 'Simply-Design-Updater/1.0' ],
 		'timeout' => 10,
 	] );
@@ -31,7 +31,8 @@ function se_debug_updater() {
 	} else {
 		$code = wp_remote_retrieve_response_code( $response );
 		$data = json_decode( wp_remote_retrieve_body( $response ) );
-		$msg  = 'GitHub API status: ' . $code . ' — latest tag: ' . ( isset( $data->tag_name ) ? $data->tag_name : 'none' ) . ' — plugin slug: ' . plugin_basename( __FILE__ );
+		$tag  = ( is_array( $data ) && ! empty( $data[0]->name ) ) ? $data[0]->name : 'none';
+		$msg  = 'GitHub API status: ' . $code . ' — latest tag: ' . $tag . ' — plugin slug: ' . plugin_basename( __FILE__ );
 	}
 	echo '<div class="notice notice-info"><p><strong>SE Updater Debug:</strong> ' . esc_html( $msg ) . '</p></div>';
 }
