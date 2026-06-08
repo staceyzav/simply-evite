@@ -5,14 +5,14 @@
  * Description: Animated envelope invitation. Drop in the shortcode, point it at your invite image and a Google Form — done.
  * Author:      Simply Design
  * Author URI:  https://simplydesign.com
- * Version:     1.0.1
+ * Version:     1.0.7
  * License:     GPL-2.0-or-later
  * Text Domain: simply-evite
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'SE_VERSION', '1.0.1' );
+define( 'SE_VERSION', '1.0.7' );
 define( 'SE_URL',     plugin_dir_url( __FILE__ ) );
 
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-github-updater.php';
