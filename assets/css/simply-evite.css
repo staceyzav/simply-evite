@@ -309,6 +309,84 @@
 }
 
 
+/* ── Add to Calendar links ──────────────────────────────────────── */
+
+.se-cal-links {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+	margin-top: 2px;
+}
+
+.se-cal-link {
+	display: inline-block;
+	padding: 5px 12px;
+	font-size: 11px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var( --client-section-dark-text, #f0f0f0 );
+	border: 1px solid rgba( 255, 255, 255, 0.25 );
+	border-radius: var( --se-radius );
+	text-decoration: none;
+	transition: background 0.2s ease, border-color 0.2s ease;
+	cursor: pointer;
+}
+
+.se-cal-link:hover,
+.se-cal-link:focus {
+	background: rgba( 255, 255, 255, 0.12 );
+	border-color: rgba( 255, 255, 255, 0.5 );
+	color: var( --client-section-dark-text, #f0f0f0 );
+	text-decoration: none;
+}
+
+
+/* ── Countdown clock ────────────────────────────────────────────── */
+
+.se-countdown {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 8px 20px;
+}
+
+.se-countdown__unit {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	min-width: 48px;
+}
+
+.se-countdown__number {
+	display: block;
+	font-size: 52px;
+	font-weight: 700;
+	line-height: 1;
+	color: var( --client-accent, #2563eb );
+	font-family: var( --client-font-display, inherit );
+	min-width: 1ch;
+	text-align: center;
+}
+
+.se-countdown__label {
+	display: block;
+	font-size: 10px;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var( --client-text, #333333 );
+	margin-top: 6px;
+}
+
+.se-countdown__message {
+	width: 100%;
+	margin: 4px 0 0;
+	font-size: 12px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var( --client-text, #333333 );
+}
+
+
 /* ── Prompt (optional, hidden by default) ───────────────────────── */
 
 .se-evite__prompt {
