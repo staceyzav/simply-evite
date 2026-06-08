@@ -71,7 +71,7 @@ class Simply_GitHub_Updater {
 		}
 
 		$response = wp_remote_get(
-			"https://api.github.com/repos/{$this->repo}/releases/latest",
+			"https://api.github.com/repos/{$this->repo}/tags",
 			[ 'headers' => $headers, 'timeout' => 10 ]
 		);
 
@@ -82,16 +82,16 @@ class Simply_GitHub_Updater {
 
 		$data = json_decode( wp_remote_retrieve_body( $response ) );
 
-		if ( empty( $data->tag_name ) ) {
+		if ( empty( $data ) || ! isset( $data[0]->name ) ) {
 			set_transient( $this->cache_key, null, 30 * MINUTE_IN_SECONDS );
 			return null;
 		}
 
 		$release = (object) [
-			'version'     => ltrim( $data->tag_name, 'v' ),
-			'zip_url'     => $data->zipball_url,
-			'description' => isset( $data->body ) ? $data->body : '',
-			'published'   => isset( $data->published_at ) ? $data->published_at : '',
+			'version'     => ltrim( $data[0]->name, 'v' ),
+			'zip_url'     => $data[0]->zipball_url,
+			'description' => '',
+			'published'   => '',
 		];
 
 		set_transient( $this->cache_key, $release, 6 * HOUR_IN_SECONDS );
