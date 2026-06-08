@@ -42,10 +42,12 @@ class Simply_GitHub_Updater {
 			add_filter( 'plugins_api', [ $this, 'plugin_info' ], 20, 3 );
 			add_filter( 'upgrader_source_selection', [ $this, 'fix_folder_name' ], 10, 4 );
 			add_action( 'wp_update_plugins', [ $this, 'purge_cache' ] );
+			add_filter( 'auto_update_plugin', [ $this, 'maybe_auto_update' ], 10, 2 );
 		} else {
 			add_filter( 'pre_set_site_transient_update_themes', [ $this, 'check_update' ] );
 			add_filter( 'upgrader_source_selection', [ $this, 'fix_folder_name' ], 10, 4 );
 			add_action( 'wp_update_themes', [ $this, 'purge_cache' ] );
+			add_filter( 'auto_update_theme', [ $this, 'maybe_auto_update' ], 10, 2 );
 		}
 	}
 
@@ -146,6 +148,15 @@ class Simply_GitHub_Updater {
 			'sections'      => [ 'changelog' => nl2br( esc_html( $release->description ) ) ],
 			'download_link' => $release->zip_url,
 		];
+	}
+
+	// ── Auto-update support ───────────────────────────────────────────
+	// Add define( 'SIMPLY_AUTO_UPDATE', true ) to wp-config.php to enable.
+
+	public function maybe_auto_update( $update, $item ) {
+		if ( ! defined( 'SIMPLY_AUTO_UPDATE' ) || ! SIMPLY_AUTO_UPDATE ) return $update;
+		$id = $this->type === 'plugin' ? ( $item->plugin ?? '' ) : ( $item->theme ?? '' );
+		return $id === $this->slug ? true : $update;
 	}
 
 	// ── Fix GitHub's auto-generated folder name after install ─────────
