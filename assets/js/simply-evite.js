@@ -29,8 +29,8 @@
 			var stageW = stage.offsetWidth;
 			var pad    = 18;
 
-			var targetCardW   = Math.round( innerH * 0.6 );
-			var maxCardWfromW = Math.round( ( stageW - pad * 2 ) / 1.5 );
+			var targetCardW   = Math.round( innerH * 0.675 );           // cardW * 4/3 = 90vh
+			var maxCardWfromW = Math.round( ( stageW - pad * 2 ) * 0.75 ); // envW fits horizontally
 			var cardW         = Math.min( targetCardW, maxCardWfromW );
 			cardW             = Math.max( cardW, 120 );
 			card.style.width  = cardW + 'px';
@@ -57,7 +57,9 @@
 			place( front, backLeft, backTop,          envW, envH  );
 
 			var openCardH = innerH * 0.9;
-			cardScale     = openCardH / cardH;
+			var scaleByH  = openCardH / cardH;
+			var scaleByW  = ( stageW * 0.97 ) / cardW;  // prevent horizontal clip
+			cardScale     = Math.min( scaleByH, scaleByW );
 			if ( cardScale < 1 ) cardScale = 1;
 			evite.style.setProperty( '--se-card-scale', cardScale );
 		}
