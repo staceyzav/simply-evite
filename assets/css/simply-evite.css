@@ -225,7 +225,7 @@
 	top: 0;
 	right: 0;
 	height: 100%;
-	width: 300px;
+	width: 75%;
 	background: var( --client-section-dark-bg, #1a1a1a );
 	box-shadow:
 		-1px 0 0 rgba( 255, 255, 255, 0.1 ),
@@ -236,6 +236,20 @@
 	z-index: 501;
 	padding: 88px 32px 48px;
 	box-sizing: border-box;
+}
+
+@media ( min-width: 1200px ) {
+	.se-sidebar-panel {
+		width: 500px;
+	}
+
+	.se-evite {
+		transition: padding-right 0.45s cubic-bezier( 0.4, 0, 0.2, 1 );
+	}
+
+	.se-evite.se-sidebar-pushed {
+		padding-right: 500px;
+	}
 }
 
 .se-sidebar-panel.is-open {
@@ -347,7 +361,9 @@
 	display: flex;
 	flex-wrap: wrap;
 	align-items: flex-start;
+	justify-content: center;
 	gap: 8px 20px;
+	text-align: center;
 }
 
 .se-countdown__unit {
@@ -373,7 +389,8 @@
 	font-size: 10px;
 	letter-spacing: 0.12em;
 	text-transform: uppercase;
-	color: var( --client-text, #333333 );
+	color: inherit;
+	opacity: 0.65;
 	margin-top: 6px;
 }
 
@@ -383,7 +400,8 @@
 	font-size: 12px;
 	letter-spacing: 0.1em;
 	text-transform: uppercase;
-	color: var( --client-text, #333333 );
+	color: inherit;
+	opacity: 0.75;
 }
 
 

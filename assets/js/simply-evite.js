@@ -79,6 +79,10 @@
 				toggleBtn.classList.add( 'is-open' );
 				toggleBtn.setAttribute( 'aria-expanded', 'true' );
 			}
+			if ( window.innerWidth >= 1200 ) {
+				evite.classList.add( 'se-sidebar-pushed' );
+				setTimeout( layout, 460 );
+			}
 		}
 
 		function closeSidebar() {
@@ -88,6 +92,8 @@
 				toggleBtn.classList.remove( 'is-open' );
 				toggleBtn.setAttribute( 'aria-expanded', 'false' );
 			}
+			evite.classList.remove( 'se-sidebar-pushed' );
+			setTimeout( layout, 460 );
 		}
 
 		if ( toggleBtn ) {
@@ -156,7 +162,14 @@
 		// ── Init ────────────────────────────────────────────────────────
 
 		layout();
-		window.addEventListener( 'resize', layout );
+		window.addEventListener( 'resize', function () {
+			layout();
+			if ( window.innerWidth < 1200 ) {
+				evite.classList.remove( 'se-sidebar-pushed' );
+			} else if ( sidePanel && sidePanel.classList.contains( 'is-open' ) ) {
+				evite.classList.add( 'se-sidebar-pushed' );
+			}
+		} );
 
 		if ( trigger === 'auto' ) {
 			setTimeout( open, delay );
