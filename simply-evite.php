@@ -5,14 +5,14 @@
  * Description: Animated envelope invitation. Drop in the shortcode, point it at your invite image and a Google Form — done.
  * Author:      Simply Design
  * Author URI:  https://simplydesign.com
- * Version:     1.0.20
+ * Version:     1.0.21
  * License:     GPL-2.0-or-later
  * Text Domain: simply-evite
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'SE_VERSION', '1.0.20' );
+define( 'SE_VERSION', '1.0.21' );
 define( 'SE_URL',     plugin_dir_url( __FILE__ ) );
 
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-github-updater.php';
@@ -84,6 +84,9 @@ function se_shortcode( $atts ) {
 	<div class="se-evite" data-trigger="<?php echo esc_attr( $trigger ); ?>" data-delay="<?php echo esc_attr( $delay ); ?>">
 
 		<div class="se-stage">
+
+			<!-- Loading bar — visible until image loads + delay elapses -->
+			<div class="se-loading" aria-hidden="true"><div class="se-loading__bar"></div></div>
 
 			<!-- Piece 1: envelope back rectangle — always visible -->
 			<div class="se-env-back" aria-hidden="true"></div>

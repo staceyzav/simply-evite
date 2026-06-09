@@ -24,6 +24,50 @@
 }
 
 
+/* ── Loading bar ────────────────────────────────────────────────── */
+
+@keyframes se-loading-sweep {
+	0%   { left: -45%; width: 45%; }
+	60%  { left: 100%; width: 45%; }
+	100% { left: 100%; width: 45%; }
+}
+
+.se-loading {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 3px;
+	z-index: 30;
+	background: rgba( 255, 255, 255, 0.15 );
+	overflow: hidden;
+	opacity: 1;
+	transition: opacity 0.4s ease;
+}
+
+.se-loading__bar {
+	position: absolute;
+	top: 0;
+	height: 100%;
+	background: var( --se-accent );
+	left: -45%;
+	width: 45%;
+	animation: se-loading-sweep 1.2s ease-in-out infinite;
+}
+
+.se-loading.is-complete .se-loading__bar {
+	animation: none;
+	left: 0;
+	width: 100%;
+	transition: left 0.25s ease, width 0.25s ease;
+}
+
+.se-evite.is-open .se-loading {
+	opacity: 0;
+	pointer-events: none;
+}
+
+
 /* ── Wrapper ────────────────────────────────────────────────────── */
 
 .se-evite {

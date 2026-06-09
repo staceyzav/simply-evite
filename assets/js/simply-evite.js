@@ -11,9 +11,13 @@
 		var cardWrap   = evite.querySelector( '.se-card-wrap' );
 		var toggleBtn  = evite.querySelector( '.se-sidebar-toggle' );
 		var sidePanel  = evite.querySelector( '.se-sidebar-panel' );
+		var loadingEl  = evite.querySelector( '.se-loading' );
+		var img        = evite.querySelector( '.se-card img' );
 		var trigger    = evite.dataset.trigger || 'auto';
 		var delay      = parseInt( evite.dataset.delay, 10 ) || 1000;
 		var opened     = false;
+		var imgReady   = false;
+		var timeReady  = trigger !== 'auto';
 
 		// Stored by layout() for use in open()
 		var backTopStore = 0;
@@ -186,15 +190,34 @@
 			}
 		} );
 
-		if ( trigger === 'auto' ) {
-			setTimeout( open, delay );
+		// ── Gate animation on image load + delay ─────────────────────────
+
+		function tryOpen() {
+			if ( ! imgReady || ! timeReady ) return;
+			// Brief pause after loading bar fills, then open
+			if ( loadingEl ) loadingEl.classList.add( 'is-complete' );
+			setTimeout( open, 350 );
+		}
+
+		if ( img && img.complete && img.naturalWidth ) {
+			imgReady = true;
+		} else if ( img ) {
+			img.addEventListener( 'load',  function () { imgReady = true; tryOpen(); } );
+			img.addEventListener( 'error', function () { imgReady = true; tryOpen(); } );
 		} else {
-			stage.addEventListener( 'click', open );
+			imgReady = true;
+		}
+
+		if ( trigger === 'auto' ) {
+			setTimeout( function () { timeReady = true; tryOpen(); }, delay );
+		} else {
+			timeReady = true;
+			stage.addEventListener( 'click', function () { imgReady = true; tryOpen(); } );
 			stage.setAttribute( 'tabindex', '0' );
 			stage.setAttribute( 'role', 'button' );
 			stage.setAttribute( 'aria-label', 'Open invitation' );
 			stage.addEventListener( 'keydown', function ( e ) {
-				if ( e.key === 'Enter' || e.key === ' ' ) { e.preventDefault(); open(); }
+				if ( e.key === 'Enter' || e.key === ' ' ) { e.preventDefault(); imgReady = true; tryOpen(); }
 			} );
 		}
 	}
