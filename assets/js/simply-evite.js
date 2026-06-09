@@ -72,6 +72,17 @@
 
 		// ── Sidebar ──────────────────────────────────────────────────────
 
+		function animateLayout( duration ) {
+			var start = performance.now();
+			function frame( now ) {
+				layout();
+				if ( now - start < duration ) {
+					requestAnimationFrame( frame );
+				}
+			}
+			requestAnimationFrame( frame );
+		}
+
 		function openSidebar() {
 			if ( ! sidePanel ) return;
 			sidePanel.classList.add( 'is-open' );
@@ -81,7 +92,8 @@
 			}
 			if ( window.innerWidth >= 1200 ) {
 				evite.classList.add( 'se-sidebar-pushed' );
-				setTimeout( layout, 460 );
+				document.body.classList.add( 'se-sidebar-open' );
+				animateLayout( 460 );
 			}
 		}
 
@@ -93,7 +105,8 @@
 				toggleBtn.setAttribute( 'aria-expanded', 'false' );
 			}
 			evite.classList.remove( 'se-sidebar-pushed' );
-			setTimeout( layout, 460 );
+			document.body.classList.remove( 'se-sidebar-open' );
+			animateLayout( 460 );
 		}
 
 		if ( toggleBtn ) {
@@ -166,8 +179,10 @@
 			layout();
 			if ( window.innerWidth < 1200 ) {
 				evite.classList.remove( 'se-sidebar-pushed' );
+				document.body.classList.remove( 'se-sidebar-open' );
 			} else if ( sidePanel && sidePanel.classList.contains( 'is-open' ) ) {
 				evite.classList.add( 'se-sidebar-pushed' );
+				document.body.classList.add( 'se-sidebar-open' );
 			}
 		} );
 
