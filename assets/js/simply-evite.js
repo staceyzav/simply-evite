@@ -232,50 +232,9 @@
 		tick();
 	}
 
-	// ── iCal download ────────────────────────────────────────────────────
-
-	function initIcsLinks() {
-		document.querySelectorAll( '.se-cal-ics' ).forEach( function ( link ) {
-			link.addEventListener( 'click', function ( e ) {
-				e.preventDefault();
-
-				var t     = link.dataset.title       || '';
-				var start = link.dataset.start       || '';
-				var end   = link.dataset.end         || '';
-				var loc   = link.dataset.location    || '';
-				var desc  = link.dataset.description || '';
-
-				var ics = [
-					'BEGIN:VCALENDAR',
-					'VERSION:2.0',
-					'PRODID:-//Simply Design//Simply Evite//EN',
-					'BEGIN:VEVENT',
-					'DTSTART:'  + start,
-					'DTEND:'    + end,
-					'SUMMARY:'  + t.replace( /,/g, '\\,' ),
-					'LOCATION:' + loc.replace( /,/g, '\\,' ),
-					'DESCRIPTION:' + desc.replace( /,/g, '\\,' ),
-					'END:VEVENT',
-					'END:VCALENDAR'
-				].join( '\r\n' );
-
-				var blob = new Blob( [ ics ], { type: 'text/calendar' } );
-				var url  = URL.createObjectURL( blob );
-				var a    = document.createElement( 'a' );
-				a.href     = url;
-				a.download = 'event.ics';
-				document.body.appendChild( a );
-				a.click();
-				document.body.removeChild( a );
-				URL.revokeObjectURL( url );
-			} );
-		} );
-	}
-
 	document.addEventListener( 'DOMContentLoaded', function () {
 		document.querySelectorAll( '.se-evite' ).forEach( initEvite );
 		document.querySelectorAll( '.se-countdown' ).forEach( initCountdown );
-		initIcsLinks();
 	} );
 
 } )();

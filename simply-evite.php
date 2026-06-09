@@ -5,14 +5,14 @@
  * Description: Animated envelope invitation. Drop in the shortcode, point it at your invite image and a Google Form — done.
  * Author:      Simply Design
  * Author URI:  https://simplydesign.com
- * Version:     1.0.18
+ * Version:     1.0.19
  * License:     GPL-2.0-or-later
  * Text Domain: simply-evite
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'SE_VERSION', '1.0.18' );
+define( 'SE_VERSION', '1.0.19' );
 define( 'SE_URL',     plugin_dir_url( __FILE__ ) );
 
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-github-updater.php';
@@ -30,11 +30,7 @@ function se_enqueue() {
 // image      — URL of the invitation image (required) — 1200×1600 portrait
 // alt        — image alt text
 // summary    — short event description shown in the sidebar
-// date       — human-readable date string, e.g. "Saturday, June 14 at 6:00 PM"
-// datetime   — machine-readable datetime, e.g. "2026-06-14 18:00:00"
-//              drives Add to Calendar links and [simply_evite_countdown]
-// duration   — event duration in minutes for calendar end time (default: 60)
-// cal_title  — calendar event title (defaults to alt text)
+// date       — date/time string, e.g. "Saturday, June 14 at 6:00 PM"
 // address    — location / address shown in the sidebar
 // rsvp_url   — Google Form or any RSVP destination URL
 // rsvp_text  — RSVP button label
@@ -53,9 +49,6 @@ function se_shortcode( $atts ) {
 		'summary'   => '',
 		'hosts'     => '',
 		'date'      => '',
-		'datetime'  => '',
-		'duration'  => '60',
-		'cal_title' => '',
 		'address'   => '',
 		'bring'     => '',
 		'attire'    => '',
@@ -83,45 +76,6 @@ function se_shortcode( $atts ) {
 	$delay       = absint( $atts['delay'] );
 	$prompt      = esc_html( $atts['prompt'] );
 	$panel_id    = 'se-panel-' . wp_unique_id();
-
-	// ── Add to Calendar ────────────────────────────────────────────────
-	$cal_links_html = '';
-	if ( ! empty( $atts['datetime'] ) ) {
-		$ts_start  = strtotime( $atts['datetime'] );
-		$ts_end    = $ts_start + ( absint( $atts['duration'] ) * 60 );
-		$cal_start = date( 'Ymd\THis', $ts_start );
-		$cal_end   = date( 'Ymd\THis', $ts_end );
-		$cal_name  = ! empty( $atts['cal_title'] ) ? $atts['cal_title'] : $atts['alt'];
-
-		$gcal_url = add_query_arg( array(
-			'action'   => 'TEMPLATE',
-			'text'     => rawurlencode( $cal_name ),
-			'dates'    => $cal_start . '/' . $cal_end,
-			'details'  => rawurlencode( strip_tags( $atts['summary'] ) ),
-			'location' => rawurlencode( strip_tags( $atts['address'] ) ),
-		), 'https://calendar.google.com/calendar/render' );
-
-		ob_start();
-		?>
-		<div class="se-sidebar__section">
-			<span class="se-sidebar__label"><?php esc_html_e( 'Add to calendar', 'simply-evite' ); ?></span>
-			<div class="se-cal-links">
-				<a href="<?php echo esc_url( $gcal_url ); ?>"
-				   class="se-cal-link"
-				   target="_blank"
-				   rel="noopener noreferrer">Google</a>
-				<a href="#"
-				   class="se-cal-link se-cal-ics"
-				   data-title="<?php echo esc_attr( $cal_name ); ?>"
-				   data-start="<?php echo esc_attr( $cal_start ); ?>"
-				   data-end="<?php echo esc_attr( $cal_end ); ?>"
-				   data-location="<?php echo esc_attr( strip_tags( $atts['address'] ) ); ?>"
-				   data-description="<?php echo esc_attr( strip_tags( $atts['summary'] ) ); ?>">Apple / Outlook</a>
-			</div>
-		</div>
-		<?php
-		$cal_links_html = ob_get_clean();
-	}
 
 	$has_sidebar = $summary || $hosts || $date || $address || $bring || $attire || $rsvp_url;
 
@@ -198,8 +152,6 @@ function se_shortcode( $atts ) {
 			</div>
 			<?php endif; ?>
 
-			<?php echo $cal_links_html; ?>
-
 			<?php if ( $address ) : ?>
 			<div class="se-sidebar__section">
 				<span class="se-sidebar__label"><?php esc_html_e( 'Where', 'simply-evite' ); ?></span>
@@ -242,7 +194,6 @@ function se_shortcode( $atts ) {
 // SHORTCODE — [simply_evite_countdown]
 //
 // datetime — machine-readable datetime, e.g. "2026-08-15 18:00:00" (required)
-// label    — text below the clock, e.g. "Until the Party"
 // ==========================================================================
 
 add_shortcode( 'simply_evite_countdown', 'se_countdown_shortcode' );
@@ -250,7 +201,6 @@ add_shortcode( 'simply_evite_countdown', 'se_countdown_shortcode' );
 function se_countdown_shortcode( $atts ) {
 	$atts = shortcode_atts( array(
 		'datetime' => '',
-		'label'    => '',
 	), $atts, 'simply_evite_countdown' );
 
 	if ( empty( $atts['datetime'] ) ) return '';
@@ -278,9 +228,6 @@ function se_countdown_shortcode( $atts ) {
 			<span class="se-countdown__number se-cd-secs" id="<?php echo $uid; ?>-secs">--</span>
 			<span class="se-countdown__label"><?php esc_html_e( 'Secs', 'simply-evite' ); ?></span>
 		</div>
-		<?php if ( $label ) : ?>
-		<p class="se-countdown__message"><?php echo $label; ?></p>
-		<?php endif; ?>
 	</div>
 	<?php
 	return ob_get_clean();
