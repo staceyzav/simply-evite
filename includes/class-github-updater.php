@@ -139,7 +139,7 @@ class Simply_GitHub_Updater {
 			'published'   => '',
 		];
 
-		set_transient( $this->cache_key, $release, 6 * HOUR_IN_SECONDS );
+		set_transient( $this->cache_key, $release, HOUR_IN_SECONDS );
 		return $release;
 	}
 
