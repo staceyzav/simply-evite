@@ -61,6 +61,11 @@ class Simply_GitHub_Updater {
 	public function inject_update() {
 		if ( ! current_user_can( 'update_plugins' ) ) return;
 
+		// Honor WP's "Check Again" button — bust our GitHub cache too.
+		if ( isset( $_GET['force-check'] ) && '1' === $_GET['force-check'] ) {
+			delete_transient( $this->cache_key );
+		}
+
 		$release = $this->get_release();
 		if ( ! $release || ! version_compare( $release->version, $this->version, '>' ) ) return;
 
