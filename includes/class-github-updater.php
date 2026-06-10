@@ -126,14 +126,14 @@ class Simply_GitHub_Updater {
 		);
 
 		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
-			set_transient( $this->cache_key, 'error', 30 * MINUTE_IN_SECONDS );
+			set_transient( $this->cache_key, 'error', 2 * MINUTE_IN_SECONDS );
 			return null;
 		}
 
 		$data = json_decode( wp_remote_retrieve_body( $response ) );
 
 		if ( empty( $data ) || ! isset( $data[0]->name ) ) {
-			set_transient( $this->cache_key, 'error', 30 * MINUTE_IN_SECONDS );
+			set_transient( $this->cache_key, 'error', 2 * MINUTE_IN_SECONDS );
 			return null;
 		}
 
@@ -144,7 +144,7 @@ class Simply_GitHub_Updater {
 			'published'   => '',
 		];
 
-		set_transient( $this->cache_key, $release, HOUR_IN_SECONDS );
+		set_transient( $this->cache_key, $release, 5 * MINUTE_IN_SECONDS );
 		return $release;
 	}
 
